@@ -2,7 +2,6 @@ package com.example.winescompose.homeModule.model
 
 import com.example.winescompose.R
 import com.example.winescompose.common.entities.MyException
-import kotlin.random.Random
 import com.example.winescompose.common.entities.Wine
 import com.example.winescompose.common.model.BaseRepository
 import com.example.winescompose.common.utils.Constants
