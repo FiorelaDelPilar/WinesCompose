@@ -16,7 +16,7 @@ class HomeRepository(private val db: HomeRoomDatabase, private val service: Home
 
     suspend fun getAllWines(callback: (List<Wine>) -> Unit) = withContext(Dispatchers.IO) {
         executeAction(MyException(Constants.EC_REQUEST, R.string.common_general_fail)) {
-            val serverOk = if (Random.nextBoolean()) true else Random.nextBoolean()
+            val serverOk = true // if (Random.nextBoolean()) true else Random.nextBoolean()
             val wines = if (serverOk) service.getRedWines() else listOf()
             callback(wines)
         }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -13,7 +14,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.example.winescompose.common.components.OneOptionDialog
 import com.example.winescompose.R
-import com.example.winescompose.common.entities.Rating
 import com.example.winescompose.common.entities.Wine
 import com.example.winescompose.homeModule.viewModel.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -38,16 +38,19 @@ fun WineList(vm: HomeViewModel = koinViewModel(), onSnackbarMsg: (String) -> Uni
     val showAddFavDialog = remember { mutableStateOf(false) }
     val wineSelected = remember { mutableStateOf<Wine?>(null) }
 
-    val snackbarMsg: Int? = null
-    val wines: List<Wine>? = listOf(Wine("Castilla", "Liria", Rating("4.7", "Good"), "Spain", "", 1.0))
+    val snackbarMsg: Int? = vm.snackbarMsg.observeAsState().value//null
+    val wines: List<Wine>? =
+        vm.wines.observeAsState().value//listOf(Wine("Castilla", "Liria", Rating("4.7", "Good"), "Spain", "", 1.0))
 
     wines?.let {
-        LazyVerticalStaggeredGrid(columns = StaggeredGridCells
-            .Adaptive(dimensionResource(id = R.dimen.home_column_min_size)),
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells
+                .Adaptive(dimensionResource(id = R.dimen.home_column_min_size)),
             verticalItemSpacing = dimensionResource(id = R.dimen.common_space_min),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.common_space_min)),
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.common_space_min))) {
-            items( wines.size ) {
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.common_space_min))
+        ) {
+            items(wines.size) {
                 val wine = wines[it]
                 ItemWine(wine = wine, modifier = Modifier.clickable {
                     showAddFavDialog.value = true
@@ -59,13 +62,16 @@ fun WineList(vm: HomeViewModel = koinViewModel(), onSnackbarMsg: (String) -> Uni
 
     if (showAddFavDialog.value && wineSelected.value != null) {
         wineSelected.value?.let { wine ->
-            OneOptionDialog(resTitle = R.string.home_dialog_title,
+            OneOptionDialog(
+                resTitle = R.string.home_dialog_title,
                 resOption = R.string.home_dialog_option_add,
                 onDismissRequest = {
                     showAddFavDialog.value = false
-                    wineSelected.value = null },
+                    wineSelected.value = null
+                },
                 onClick = {
-
+                    wine.isFavorite = true
+                    vm.addWine(wine)
                 })
         }
     }
